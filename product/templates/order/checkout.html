@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<style>
+    .checkout-container {
+        margin: 30px auto;
+        max-width: 1200px;
+    }
+    .item-image {
+        width: 76px;
+        height: 76px;
+        border-radius: 4px;
+    }
+    .table th {
+        background-color: #f8f8f8;
+    }
+    .total-price {
+        font-weight: bold;
+        font-size: 1.25rem;
+        color: #ff3d00; /* Flipkart's accent color */
+    }
+    .address-select {
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 10px;
+    }
+</style>
+
+<div class="container checkout-container">
+    <h2 class="text-center">Checkout</h2>
+    <form method="POST" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th scope="col">Item Name</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Color</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Price</th>
+                                    {% if cart.discount_code %} <!-- Check if a discount code exists -->
+                                    <th scope="col">Discounted Price</th>
+                                   
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart.items.all %}
+                                <tr>
+                                    <td>
+                                        {% if item.product_variant.product.images.first %}
+                                            <img src="{{ item.product_variant.product.images.first.image.url }}" class="item-image" />
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.product_variant.product.name }}</td>
+                                    <td>{{ item.product_variant.size }}</td>
+                                    <td>{{ item.product_variant.color }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₹{{ item.get_total_price|floatformat:2 }}</td>
+
+                                    {% if cart.discount_code %} <!-- Display discounted price if applicable -->
+                                    <td>
+                                        {% if cart.discount_code.discount_type == 'percentage' %}
+                                            -{{ cart.discount_code.discount_percentage }}%
+                                        {% elif cart.discount_code.discount_type == 'price' %}
+                                            ₹{{ cart.discount_code.discount_price }}
+                                        {% endif %}
+                                    </td>
+                                    {% else %}
+                                    <td></td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <h4 class="total-price">Total Price: ₹{{ cart.final_price|floatformat:2 }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3>Select Billing Address</h3>
+                        <select class="form-select address-select mb-3" name="billing_address" required>
+                            <option value="" disabled selected>Select your billing address</option>
+                            {% for address in billing_addresses %}
+                            <option value="{{ address.id }}">{{ address.state }}, {{ address.city }}, {{ address.postal_code }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <h3>Select Shipping Address</h3>
+                        <select class="form-select address-select mb-4" name="shipping_address" required>
+                            <option value="" disabled selected>Select your shipping address</option>
+                            {% for address in shipping_addresses %}
+                            <option value="{{ address.id }}">{{ address.state }}, {{ address.city }}, {{ address.postal_code }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <h4 class="font-weight-bold">Payment Method: <span class="text-success">Cash On Delivery</span></h4>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg btn-block mt-4">Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}My Site{% endblock %}</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <style>
+    /* Search Container */
+    .search-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Search Input Field */
+    .search-input {
+        border-radius: 30px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 10px 20px;
+        border: 1px solid #ccc;
+        transition: border 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+    }
+
+    /* Search Button */
+    .search-btn {
+        border-radius: 50%;
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-btn:hover {
+        background-color: #0056b3;
+    }
+
+    /* Header content */
+    .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .nav-link {
+        font-weight: 500;
+    }
+
+    /* Autocomplete List */
+    .autocomplete-items {
+        position: absolute;
+        z-index: 99;
+        width: 30%;
+        max-height: 300px;
+        overflow-y: auto;
+        background-color: white;
+       
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 10px;
+        padding: 0;
+    }
+
+    .autocomplete-items a {
+        display: block;
+        padding: 10px 15px;
+        color: #333;
+        font-size: 16px;
+        text-decoration: none;
+        border-bottom: 1px solid #f1f1f1;
+        transition: background-color 0.2s ease;
+    }
+
+    .autocomplete-items a:last-child {
+        border-bottom: none;
+    }
+
+    .autocomplete-items a:hover {
+        background-color: #f1f1f1;
+        color: #007bff;
+    }
+
+    /* No results found text */
+    #no-results {
+        color: #666;
+        font-size: 14px;
+        padding: 10px 15px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    /* Smooth scrolling for long autocomplete lists */
+    .autocomplete-items::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .autocomplete-items::-webkit-scrollbar-thumb {
+        background-color: #007bff;
+        border-radius: 4px;
+    }
+
+    .autocomplete-items::-webkit-scrollbar-track {
+        background-color: #f1f1f1;
+    }
+</style>
+
+</head>
+
+<body>
+  <header>
+    <!-- Jumbotron -->
+    <div class="p-3 text-center bg-white border-bottom">
+      <div class="container">
+        <div class="row gy-3">
+          <!-- Left elements -->
+          <div class="col-lg-2 col-sm-4 col-4 text-center"> <!-- Center content if necessary -->
+            <a href="#" class="d-block"> <!-- Ensure image stays on its own line -->
+                {% if site_settings.logo %}
+                    <img src="{{ site_settings.logo.url }}" alt="Site Logo" class="img-fluid mb-2" style="height: 45px;">
+                {% else %}
+                    <!-- Placeholder for missing logo -->
+                {% endif %}
+            </a>
+            <h1 class="h4 mb-0">{{ site_settings.site_title }}</h1>
+        </div>
+        
+        
+  
+          <!-- Center elements -->
+          <div class="order-lg-last col-lg-5 col-sm-8 col-8">
+            <div class="d-flex float-end">
+                {% if user.is_authenticated %}
+                    <!-- Show Logout Link -->
+                    <a href="{% url 'logout' %}" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center">
+                        <i class="fas fa-sign-out-alt m-1 me-md-2"></i>
+                        <p class="d-none d-md-block mb-0">Logout</p>
+                    </a>
+                {% else %}
+                    <!-- Show Sign in Link -->
+                    <a href="{% url 'login' %}" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center">
+                        <i class="fas fa-user-alt m-1 me-md-2"></i>
+                        <p class="d-none d-md-block mb-0">Sign in</p>
+                    </a>
+                    <a href="{% url 'user_chat_request' %}" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center">
+                      <i class="fas fa-user-alt m-1 me-md-2"></i>
+                      <p class="d-none d-md-block mb-0">Live Chat</p>
+                  </a>
+                {% endif %}
+                
+                <!-- Wishlist Link -->
+                <a href="{% url 'wishlist_view' %}" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center">
+                    <i class="fas fa-heart m-1 me-md-2"></i>
+                    <p class="d-none d-md-block mb-0">Wishlist</p>
+                </a>
+                
+                
+
+                <a href="{% url 'view_cart' %}" class="border rounded py-1 px-3 nav-link d-flex align-items-center position-relative">
+                    <i class="fas fa-shopping-cart m-1 me-md-2"></i>
+                    <p class="d-none d-md-block mb-0">My cart</p>
+                    {% if cart_items_count > 0 %}
+                    <span class="badge bg-primary position-absolute top-0 start-100 translate-middle">
+                         {{ cart_items_count }}
+                    </span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+        
+          <!-- Center elements -->
+  
+          <!-- Right elements -->
+          <div class="col-lg-5 col-md-12 col-12">
+            <div class="search-container d-flex justify-content-center align-items-center">
+                <input type="search" id="searchInput" class="form-control search-input" placeholder="Search for products..." />
+                <button type="button" class="btn search-btn ms-2">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div id="autocomplete-list" class="autocomplete-items text-black" ></div>
+            <div id="no-results" style="display: none;">No results found</div>
+        </div>
+          <!-- Right elements -->
+        </div>
+      </div>
+    </div>
+    <!-- Jumbotron -->
+  
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #f5f5f5;">
+      <div class="container">
+        <!-- Toggle button -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Collapsible wrapper -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a href="{% url 'home' %}" class="nav-link text-dark" >Home</a>
+            </li>
+            <li class="nav-item"></li>
+              <a  class="nav-link text-dark" href="{% url 'product_list' %}">Shop</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link text-dark" href="{% url 'profile' %}">Account</a>
+            </li>
+            
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Others
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Navbar -->
+  </header>
+  <div class="mt-3 mb-5">
+  {% block content %}
+  {% endblock %}
+</div>
+
+  <!-- Footer -->
+  <footer class="text-center text-lg-start text-muted mt-3" style="background-color: #f5f5f5;">
+    <!-- Section: Links  -->
+    <section class="">
+      <div class="container text-center text-md-start pt-4 pb-4">
+        <!-- Grid row -->
+        <div class="row mt-3">
+          <!-- Grid column -->
+          <div class="col-12 col-lg-3 col-sm-12 mb-2">
+            <!-- Content -->
+            <a href="https://mdbootstrap.com/" target="_blank" class="">
+              {% if site_settings.logo %}
+              <img src="{{ site_settings.logo.url }}" alt="Site Logo" class="img-fluid mb-2" style="height: 45px;">
+          {% else %}
+              <!-- Placeholder for missing logo -->
+          {% endif %}
+            </a>
+            <p class="mt-2 text-dark">
+              © 2023 Copyright: MDBootstrap.com
+            </p>
+          </div>
+          <!-- Grid column -->
+  
+          <!-- Grid column -->
+          <div class="col-6 col-sm-4 col-lg-2">
+            <!-- Links -->
+            <h6 class="text-uppercase text-dark fw-bold mb-2">
+              Store
+            </h6>
+            <ul class="list-unstyled mb-4">
+              <li><a class="text-muted" href="#">About us</a></li>
+              <li><a class="text-muted" href="#">Find store</a></li>
+              <li><a class="text-muted" href="#">Categories</a></li>
+              <li><a class="text-muted" href="#">Blogs</a></li>
+            </ul>
+          </div>
+          <!-- Grid column -->
+  
+          <!-- Grid column -->
+          <div class="col-6 col-sm-4 col-lg-2">
+            <!-- Links -->
+            <h6 class="text-uppercase text-dark fw-bold mb-2">
+              Information
+            </h6>
+            <ul class="list-unstyled mb-4">
+              <li><a class="text-muted" href="#">Help center</a></li>
+              <li><a class="text-muted" href="#">Money refund</a></li>
+              <li><a class="text-muted" href="#">Shipping info</a></li>
+              <li><a class="text-muted" href="#">Refunds</a></li>
+            </ul>
+          </div>
+          <!-- Grid column -->
+  
+          <!-- Grid column -->
+          <div class="col-6 col-sm-4 col-lg-2">
+            <!-- Links -->
+            <h6 class="text-uppercase text-dark fw-bold mb-2">
+              Support
+            </h6>
+            <ul class="list-unstyled mb-4">
+              <li><a class="text-muted" href="#">Help center</a></li>
+              <li><a class="text-muted" href="#">Documents</a></li>
+              <li><a class="text-muted" href="#">Account restore</a></li>
+              <li><a class="text-muted" href="#">My orders</a></li>
+            </ul>
+          </div>
+          <!-- Grid column -->
+  
+          <!-- Grid column -->
+          <div class="col-12 col-sm-12 col-lg-3">
+            <!-- Links -->
+            <h6 class="text-uppercase text-dark fw-bold mb-2">Newsletter</h6>
+            <p class="text-muted">Stay in touch with latest updates about our products and offers</p>
+            <div class="input-group mb-3">
+              <input type="email" class="form-control border" placeholder="Email" aria-label="Email" aria-describedby="button-addon2" />
+              <button class="btn btn-light border shadow-0" type="button" id="button-addon2" data-mdb-ripple-color="dark">
+                Join
+              </button>
+            </div>
+          </div>
+          <!-- Grid column -->
+        </div>
+        <!-- Grid row -->
+      </div>
+    </section>
+    <!-- Section: Links  -->
+  
+    <div class="">
+      <div class="container">
+        <div class="d-flex justify-content-between py-4 border-top">
+          <!--- payment --->
+          <div>
+            <i class="fab fa-lg fa-cc-visa text-dark"></i>
+            <i class="fab fa-lg fa-cc-amex text-dark"></i>
+            <i class="fab fa-lg fa-cc-mastercard text-dark"></i>
+            <i class="fab fa-lg fa-cc-paypal text-dark"></i>
+          </div>
+          <!--- payment --->
+  
+          <!--- language selector --->
+          <div class="dropdown dropup">
+            <a class="dropdown-toggle text-dark" href="#" id="Dropdown" role="button" data-mdb-toggle="dropdown" aria-expanded="false"> <i class="flag-united-kingdom flag m-0 me-1"></i>English </a>
+  
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="Dropdown">
+              <li>
+                <a class="dropdown-item" href="#"><i class="flag-united-kingdom flag"></i>English <i class="fa fa-check text-success ms-2"></i></a>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a class="dropdown-item" href="#"><i class="flag-poland flag"></i>Polski</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#"><i class="flag-china flag"></i>中文</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#"><i class="flag-japan flag"></i>日本語</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#"><i class="flag-germany flag"></i>Deutsch</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#"><i class="flag-france flag"></i>Français</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#"><i class="flag-spain flag"></i>Español</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#"><i class="flag-russia flag"></i>Русский</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#"><i class="flag-portugal flag"></i>Português</a>
+              </li>
+            </ul>
+          </div>
+        
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("searchInput");
+    const autocompleteList = document.getElementById("autocomplete-list");
+    const noResultsDiv = document.getElementById("no-results");
+
+    searchInput.addEventListener("input", function() {
+        const query = this.value;
+
+        autocompleteList.innerHTML = "";
+        noResultsDiv.style.display = "none";
+
+        if (!query) {
+            return false;
+        }
+
+        // Fetch search suggestions
+        fetch(`/search-suggestions/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    noResultsDiv.style.display = "block";
+                } else {
+                    data.forEach(item => {
+                        const suggestionLink = document.createElement("a");
+                        suggestionLink.href = item.url;
+                        suggestionLink.innerText = item.name;
+                        suggestionLink.classList.add("autocomplete-item");
+                        autocompleteList.appendChild(suggestionLink);
+                    });
+                    noResultsDiv.style.display = "none";
+                }
+            });
+    });
+
+    document.addEventListener("click", function(e) {
+        if (e.target !== searchInput) {
+            autocompleteList.innerHTML = "";
+            noResultsDiv.style.display = "none";
+        }
+    });
+});
+
+  </script>
+
+<script>
+  document.getElementById('productFilter').addEventListener('change', function() {
+      this.form.submit(); // Submit the form when the dropdown value changes
+  });
+</script>
+</body>
+
+</html>

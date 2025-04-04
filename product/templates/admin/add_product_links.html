@@ -1,0 +1,71 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container {
+            max-width: 600px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-weight: bold;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+        .list-group-item {
+            border: none;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .list-group-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .list-group-item i {
+            margin-right: 10px;
+        }
+        .list-group-item a {
+            font-size: 18px;
+            font-weight: 500;
+            color: #343a40;
+        }
+        .list-group-item a:hover {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .amazon { color: #FF9900; }
+        .myntra { color: #FF3E6C; }
+        .ajio { color: #2874F0; }
+        .flipkart{ color: #FF9F00; }
+    </style>
+</head>
+<div class="container my-5">
+    <h2 class="text-center">Add Product</h2>
+    <ul class="list-group">
+        <li class="list-group-item d-flex align-items-center">
+            <i class="fab fa-amazon fa-2x amazon"></i>
+            <a href="{% url 'add_amazon_product' %}">Add Amazon Product</a>
+        </li>
+        <li class="list-group-item d-flex align-items-center">
+            <i class="fas fa-shopping-bag fa-2x myntra"></i>
+            <a href="{% url 'add_myntra_product' %}">Add Myntra Product</a>
+        </li>
+        <li class="list-group-item d-flex align-items-center">
+            <i class="fas fa-store fa-2x ajio"></i>
+            <a href="{% url 'add_ajio_product' %}">Add Ajio Product</a>
+        </li>
+        <li class="list-group-item d-flex align-items-center">
+            <i class="fas fa-truck fa-2x flipkart"></i>
+            <a href="{% url 'add_flipkart_product' %}">Add Flipkart Product</a>
+        </li>
+    </ul>
+</div>
+{% endblock %}

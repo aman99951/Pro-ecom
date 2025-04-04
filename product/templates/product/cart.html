@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+
+<section class="bg-light my-5">
+    <div class="container">
+        <div class="row">
+            {% if messages %}
+            <ul class="messages text-primary" style="list-style: none;">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <!-- Cart Section -->
+            <div class="col-lg-9">
+                <div class="card border shadow-0">
+                    <div class="m-4">
+                        <h4 class="card-title mb-4">Your Shopping Cart</h4>
+
+                        <!-- Cart Items -->
+                        {% for item in cart_items %}
+                        <div class="row gy-3 mb-4 align-items-center">
+                            <div class="col-lg-5">
+                                <div class="d-flex">
+                                    {% if item.product_variant.product.images.first %}
+                                        <img src="{{ item.product_variant.product.images.first.image.url }}" class="border rounded me-3" style="width: 76px; height: 76px;" />
+                                    {% endif %}
+                                    <div>
+                                        <a href="#" class="nav-link">{{ item.product_variant.product.name }}</a>
+                                        <p class="text-muted">{{ item.product_variant.description }}</p>
+                                        <p class="text-muted">Size: {{ item.product_variant.size }} | Color: {{ item.product_variant.color }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-sm-6">
+                                <form method="post" action="{% url 'update_cart_item' item.id %}">
+                                    {% csrf_token %}
+                                    <select name="quantity" class="form-select me-4" style="width: 100px;" onchange="this.form.submit()">
+                                        {% for i in quantity_options %}
+                                            <option value="{{ i }}" {% if i == item.quantity %}selected{% endif %}>{{ i }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                                <div>
+                                    <small class="text-muted">{{ item.product_variant.price }} / per item</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 text-end">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <a href="{% url 'toggle_wishlist' item.product_variant.product.id %}" class="btn btn-light border px-2 icon-hover-primary" title="Add to Wishlist">
+                                        <i class="fas fa-heart fa-lg {% if item.product_variant.product in wishlist_products %}text-danger{% else %}text-secondary{% endif %}"></i>
+                                    </a>
+                                    <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-light border text-danger px-2" title="Remove from Cart">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>Your cart is empty.</p>
+                        {% endfor %}
+
+                        <div class="border-top pt-4">
+                            <p><i class="fas fa-truck text-muted"></i> Free Delivery within 1-2 weeks</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="col-lg-3">
+                <div class="card border shadow-0 mb-3">
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label>Have a coupon?</label>
+                                <div class="input-group">
+                                    <input type="text" name="discount_code" class="form-control" placeholder="Coupon code" value="{{ discount_code }}" />
+                                    {% if discount_code %}
+                                        <button type="submit" name="remove_discount" class="btn btn-danger border">Remove Discount</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-light border">Apply</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card border shadow-0">
+                    <div class="card-body">
+                        <hr />
+                        <div class="d-flex justify-content-between">
+                            <p>Total price:</p>
+                            <p class="fw-bold">Rs {{ total_price }}</p>
+                        </div>  
+                        {% for field in dynamic_price_fields %}
+                        <div class="d-flex justify-content-between">
+                            <p>{{ field.label }}:</p>
+                            <p class="fw-bold">+Rs {{ field.value }}</p>
+                        </div>
+                        {% endfor %}
+
+                        {% if discount_code %}
+                        <div class="d-flex justify-content-between">
+                            <p>Discount:</p>
+                            <p class="fw-bold">-Rs {{ discount_value|floatformat:2 }}</p>
+                        </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-between">
+                            <p>Final price:</p>
+                            <p class="fw-bold" >Rs {{ final_price|floatformat:2 }}</p>
+                        </div>
+                        <div class="mt-3">
+                            <a href="{% url 'checkout' %}" class="btn btn-success w-100 {% if cart_items|length == 0 %}disabled{% endif %}">Checkout</a>
+                            <a href="{% url 'product_list' %}" class="btn btn-light w-100 border mt-2">Back to shop</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recommended Items Section -->
+<section>
+    <div class="container my-5">
+        <header class="mb-4">
+            <h3>Recommended Items</h3>
+        </header>
+        <div class="row">
+            {% for product in recommended_items %}
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-4 d-flex">
+                <div class="card w-100 shadow-sm">
+                    <img src="{{ product.images.first.image.url }}" class="card-img-top product-img" alt="{{ product.name }}" width="300px" height="300px">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-truncate">{{ product.name }}</h5>
+                        <p class="mb-1"><strong>Size:</strong> {{ product.variants.first.size }} <strong>Color:</strong> {{ product.variants.first.color }}</p>
+                        <p class="text-primary h5">${{ product.variants.first.price }}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary btn-sm shadow-sm">Buy Now</a>
+                            <a href="{% url 'toggle_wishlist' product.pk %}" class="btn btn-light border btn-sm icon-hover">
+                                <i class="fas fa-heart fa-lg {% if request.user.is_authenticated and product in request.user.wishlist.products.all %}text-danger{% else %}text-secondary{% endif %}"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

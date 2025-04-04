@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <!-- Sidebar for profile navigation -->
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action active">Profile</a>
+                <a href="{% url 'order_list' %}" class="list-group-item list-group-item-action">Orders</a>
+                <a href="{% url 'invoice_list' %}" class="list-group-item list-group-item-action">Invoices</a>
+                <a href="{% url 'create_ticket' %}" class="list-group-item list-group-item-action">HelpDesk</a>
+                
+                <a href="{% url 'user_chat_request' %}" class="list-group-item list-group-item-action">Live Chat</a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            {% if messages %}
+                <div class="container mt-3">
+                    {% for message in messages %}
+                        <div class="alert alert-success">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- User Information Section -->
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-body">
+                    <h4 class="mb-3">User Information</h4>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-group">
+                                <label for="user_name"><i class="fas fa-user"></i> Name</label>
+                                <input type="text" id="user_name" class="form-control" value="{{ user.first_name }}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-group">
+                                <label for="user_email"><i class="fas fa-envelope"></i> Email</label>
+                                <input type="email" id="user_email" class="form-control" value="{{ user.email }}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-group">
+                                <label for="user_phone"><i class="fas fa-phone"></i> Phone Number</label>
+                                <input type="text" id="user_phone" class="form-control" value="{{ user.profile.mobile }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Information Form -->
+            <form method="post">
+                {% csrf_token %}
+                <div class="card mb-4 shadow-sm border-0">
+                    <div class="card-body">
+                        <h4 class="mb-3 d-flex justify-content-between align-items-center">
+                            Billing Address
+                            <a href="{% url 'add_billing_address' %}" class="btn btn-outline-secondary">Add Billing Address</a>
+                        </h4>
+                        <div class="row">
+                            {% for field in address_form %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        {{ field.label_tag }}
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ field.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" name="save_address" class="btn btn-primary">Save Address</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Shipping Information Form -->
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                <div class="card mb-4 shadow-sm border-0">
+                    <div class="card-body">
+                        <h4 class="mb-3 d-flex justify-content-between align-items-center">
+                            Shipping Address
+                            <a href="{% url 'add_shipping_address' %}" class="btn btn-outline-secondary">Add Shipping Address</a>
+                        </h4>
+                        <div class="row">
+                            {% for field in shipping_form %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        {{ field.label_tag }}
+                                        {{ field }}
+                                        {% if field.errors %}
+                                            <div class="invalid-feedback">
+                                                {{ field.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" name="save_shipping" class="btn btn-primary">Save Shipping Info</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Password Change Form -->
+            <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#changePasswordForm" aria-expanded="false" aria-controls="changePasswordForm">
+                Change Password
+            </button>
+
+            <!-- Collapsible Form -->
+            <div class="collapse" id="changePasswordForm">
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="card mb-4 shadow-sm border-0">
+                        <div class="card-body">
+                            <h4>Change Password</h4>
+                            <div class="row">
+                                {% for field in password_form %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            {{ field.label_tag }}
+                                            {{ field }}
+                                            {% if field.errors %}
+                                                <div class="invalid-feedback">
+                                                    {{ field.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="submit" name="change_password" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Style for labels and form fields */
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    /* Input, textarea, select styling */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+    }
+
+    /* Invalid feedback */
+    .form-group .invalid-feedback {
+        color: red;
+        font-size: 0.9rem;
+    }
+
+    /* Card styling for better visuals */
+    .card {
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Add button alignment */
+    .d-flex.justify-content-between {
+        align-items: center;
+    }
+</style>
+{% endblock %}

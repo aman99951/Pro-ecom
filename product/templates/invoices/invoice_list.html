@@ -1,0 +1,61 @@
+{% extends 'base.html' %} <!-- Changed the base template -->
+
+{% block title %}Manage Invoices{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">Invoice Management</h3>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Make the table responsive and highlight it with new styles -->
+                    <div class="table-responsive">
+                        <table class="table table-borderless table-hover">
+                            <thead class="bg-light text-primary">
+                                <tr>
+                                    <th scope="col">Invoice No.</th>
+                                    <th scope="col">Order ID</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Amount</th>
+                                    <th scope="col">Issued Date</th>
+                                    <th scope="col" class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in invoices %}
+                                <tr>
+                                    <td>{{ invoice.invoice_number }}</td>
+                                    <td>{{ invoice.order.id }}</td>
+                                    <td>{{ invoice.status }}</td>
+                                    <td>{{ invoice.amount_due }}</td>
+                                    <td>{{ invoice.issued_date }}</td>
+                                    <td class="text-center">
+                                        <a href="{% url 'invoice_detail' invoice.id %}" class="btn btn-outline-info btn-sm mx-1" title="View Invoice">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'mark_invoice_as_paid' invoice.id %}" class="btn btn-outline-success btn-sm mx-1" title="Mark as Paid">
+                                            <i class="fas fa-check-circle"></i>
+                                        </a>
+                                        <a href="{% url 'cancel_invoice' invoice.id %}" class="btn btn-outline-danger btn-sm mx-1" title="Cancel Invoice">
+                                            <i class="fas fa-times-circle"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No invoices available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

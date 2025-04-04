@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="container reg mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-body shadow p-4">
+                    <h2 class="my-4 text-center">Register</h2>
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.name.label_tag }}
+                                    {{ form.name}}
+                                    {{ form.name.errors }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.email.label_tag }}
+                                    {{ form.email}}
+                                    {{ form.email.errors }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.mobile.label_tag }}
+                                    {{ form.mobile}}
+                                    {{ form.mobile.errors }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.password1.label_tag }}
+                                    {{ form.password1}}
+                                    {{ form.password1.errors }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.password2.label_tag }}
+                                    {{ form.password2 }}
+                                    {{ form.password2.errors }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn " style="background-color: #0056b3; color: white;">Register</button>
+                        </div>
+                        <br/>
+                        <div class="text-center">
+                            <a href="{% url 'login' %}" class="text-muted">If you have an account, Click Here</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Custom styles for the registration form */
+.card {
+    border-radius: 15px;
+    border: none;
+}
+
+.card-body {
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-dark {
+    background-color: #1c1c1f;
+    color: #fff;
+    border: 1px solid white;
+    transition: background-color 0.3s ease;
+}
+
+.btn-dark:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+h2 {
+    font-weight: bold;
+}
+
+a.text-muted {
+    color: #6c757d !important;
+}
+
+a.text-muted:hover {
+    color: #000;
+    text-decoration: underline;
+}
+</style>
+{% endblock %}

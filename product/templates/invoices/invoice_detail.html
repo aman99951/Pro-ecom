@@ -1,0 +1,131 @@
+{% extends 'base.html' %} <!-- Changed base template -->
+
+{% block title %}Invoice Details: {{ invoice.invoice_number }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" id="invoice-content">
+    <!-- Invoice Header -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2 class="text-primary">Invoice</h2>
+                    <p><strong>Invoice No:</strong> {{ invoice.invoice_number }}</p>
+                    <p><strong>Order ID:</strong> {{ invoice.order.id }}</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p><strong>Issued Date:</strong> {{ invoice.issued_date }}</p>
+                    <p>
+                        <strong>Status:</strong> 
+                        {% if invoice.status == 'pending' %}
+                            <span class="badge bg-warning text-dark"><i class="fas fa-hourglass-half"></i> Pending</span>
+                        {% elif invoice.status == 'paid' %}
+                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Paid</span>
+                        {% elif invoice.status == 'canceled' %}
+                            <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Canceled</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Billing & Shipping Information -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h4 class="text-dark">Billing Address</h4>
+                    <p class="text-muted">{{ invoice.order.billing_address.address_1 }}, {{ invoice.order.billing_address.city }}</p>
+                    <p class="text-muted">{{ invoice.order.billing_address.state }}, {{ invoice.order.billing_address.country }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h4 class="text-dark">Shipping Address</h4>
+                    <p class="text-muted">{{ invoice.order.shipping_address.address_1 }}, {{ invoice.order.shipping_address.city }}</p>
+                    <p class="text-muted">{{ invoice.order.shipping_address.state }}, {{ invoice.order.shipping_address.country }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product and Pricing Details -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="text-dark">Order Details</h4>
+            <table class="table table-hover">
+                <thead class="bg-secondary text-white">
+                    <tr>
+                        <th>Product</th>
+                        <th>Variant</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in invoice.order.items.all %}
+                    <tr>
+                        <td>{{ item.product_variant.product.name }}</td>
+                        <td>{{ item.product_variant.color }} {{ item.product_variant.size }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>Rs {{ item.price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="d-flex justify-content-start">
+                {% if invoice.status == 'pending' %}
+                    <a href="{% url 'mark_invoice_as_paid' invoice.id %}" class="btn btn-outline-success me-2"><i class="fas fa-check-circle"></i> Mark as Paid</a>
+                    <a href="{% url 'cancel_invoice' invoice.id %}" class="btn btn-outline-danger"><i class="fas fa-times-circle"></i> Cancel Invoice</a>
+                {% elif invoice.status == 'paid' %}
+                    <p class="text-success"><i class="fas fa-check"></i> Paid on {{ invoice.payment_date }}</p>
+                {% elif invoice.status == 'canceled' %}
+                    <p class="text-danger"><i class="fas fa-times"></i> Invoice Canceled</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h4 class="text-dark">Order Summary</h4>
+                    <p><strong>Subtotal:</strong> ${{ invoice.order.final_price }}</p>
+                    {% if invoice.order.cart.discount_code %}
+                    <p><strong>Discount ({{ invoice.order.cart.discount_code.code }}):</strong> -Rs{{ invoice.order.cart.discount_code.discount_price }}</p>
+                    {% endif %}
+                    <p><strong>Total Amount Due:</strong> <span class="fw-bold">${{ invoice.amount_due }}</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download PDF Button -->
+    <div class="text-center mt-5">
+        <button onclick="downloadPDF()" class="btn btn-primary btn-lg"><i class="fas fa-file-pdf"></i> Download Invoice as PDF</button>
+    </div>
+</div>
+
+<!-- Add the html2pdf.js library for PDF download functionality -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<script>
+    function downloadPDF() {
+        var element = document.getElementById('invoice-content');  // Select content to convert
+        html2pdf().from(element).set({
+            margin: 1,
+            filename: 'invoice_{{ invoice.invoice_number }}.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        }).save();
+    }
+</script>
+{% endblock %}

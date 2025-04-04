@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <!-- Sale Products Section -->
+        <header class="mb-4 text-center">
+            <h3 class="font-weight-bold">On Sale</h3>
+            <p class="text-muted">Grab the best deals today!</p>
+        </header>
+        <div class="row">
+            {% for product in sale_products %}
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-4 d-flex">
+                <div class="card w-100 shadow-sm position-relative">
+                    <img src="{{ product.images.first.image.url }}" class="card-img-top product-img" alt="{{ product.name }}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-truncate">{{ product.name }}</h5>
+                        <p class="mb-1"><strong>Size:</strong> {{ product.variants.first.size }} <strong>Color:</strong> {{ product.variants.first.color }}</p>
+                        
+                        {% if product.variants.first.original_price and product.variants.first.price < product.variants.first.original_price %}
+                            <div class="mb-2">
+                               
+                                <span class="text-primary h5 ml-2">Rs {{ product.variants.first.price }}</span>
+                                <span class="text-danger h5 " style="font-size: 1.2rem;">
+                                    <s>Rs {{ product.variants.first.original_price }}</s>
+                                </span>
+                            </div>
+                            <!-- On Sale Image Badge -->
+                            <span class="position-absolute" style="top: 10px; right: 10px;">
+                                <img src="https://i.pinimg.com/originals/90/18/da/9018da7e6cead7a1a045d0e85e7b38d6.png" alt="On Sale" style="width: 60px; height: auto;">
+                            </span>
+                        {% else %}
+                            <p class="text-primary h5">Rs {{ product.variants.first.price }}</p>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary btn-sm shadow-sm">Buy Now</a>
+                            <a href="{% url 'toggle_wishlist' product.pk %}" class="btn btn-light border btn-sm icon-hover">
+                                <i class="fas fa-heart fa-lg {% if request.user.is_authenticated and product in request.user.wishlist.products.all %}text-danger{% else %}text-secondary{% endif %}"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Featured Products Section -->
+        <header class="mb-4 text-center">
+            <h3 class="font-weight-bold">Featured Products</h3>
+            <p class="text-muted">Our best picks for you!</p>
+        </header>
+        <div class="row">
+            {% for product in featured_products %}
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-4 d-flex">
+                <div class="card w-100 shadow-sm position-relative">
+                    <img src="{{ product.images.first.image.url }}" class="card-img-top product-img" alt="{{ product.name }}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-truncate">{{ product.name }}</h5>
+                        <p class="mb-1"><strong>Size:</strong> {{ product.variants.first.size }} <strong>Color:</strong> {{ product.variants.first.color }}</p>
+                        
+                        {% if product.variants.first.original_price and product.variants.first.price < product.variants.first.original_price %}
+                            <div class="mb-2">
+                                <span class="text-primary h5 ml-2">Rs {{ product.variants.first.price }}</span>
+                                <span class="text-danger h5 " style="font-size: 1.2rem;">
+                                    <s>Rs {{ product.variants.first.original_price }}</s>
+                                </span>
+                            </div>
+                            <span class="position-absolute" style="top: 10px; right: 10px;">
+                                <img src="https://i.pinimg.com/originals/90/18/da/9018da7e6cead7a1a045d0e85e7b38d6.png" alt="On Sale" style="width: 60px; height: auto;">
+                            </span>
+                        {% else %}
+                            <p class="text-primary h5">Rs {{ product.variants.first.price }}</p>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary btn-sm shadow-sm">Buy Now</a>
+                            <a href="{% url 'toggle_wishlist' product.pk %}" class="btn btn-light border btn-sm icon-hover">
+                                <i class="fas fa-heart fa-lg {% if request.user.is_authenticated and product in request.user.wishlist.products.all %}text-danger{% else %}text-secondary{% endif %}"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Top Selling Products Section -->
+        <header class="mb-4 text-center">
+            <h3 class="font-weight-bold">Top Selling</h3>
+            <p class="text-muted">Best-selling products this season!</p>
+        </header>
+        <div class="row">
+            {% for product in top_selling_products %}
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-4 d-flex">
+                <div class="card w-100 shadow-sm position-relative">
+                    <img src="{{ product.images.first.image.url }}" class="card-img-top product-img" alt="{{ product.name }}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-truncate">{{ product.name }}</h5>
+                        <p class="mb-1"><strong>Size:</strong> {{ product.variants.first.size }} <strong>Color:</strong> {{ product.variants.first.color }}</p>
+                        
+                        {% if product.variants.first.original_price and product.variants.first.price < product.variants.first.original_price %}
+                            <div class="mb-2">
+                                <span class="text-primary h5 ml-2">Rs {{ product.variants.first.price }}</span>
+                                <span class="text-danger h5 " style="font-size: 1.2rem;">
+                                    <s>Rs {{ product.variants.first.original_price }}</s>
+                                </span>
+                            </div>
+                            <span class="position-absolute" style="top: 10px; right: 10px;">
+                                <img src="https://i.pinimg.com/originals/90/18/da/9018da7e6cead7a1a045d0e85e7b38d6.png" alt="On Sale" style="width: 60px; height: auto;">
+                            </span>
+                        {% else %}
+                            <p class="text-primary h5">Rs {{ product.variants.first.price }}</p>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary btn-sm shadow-sm">Buy Now</a>
+                            <a href="{% url 'toggle_wishlist' product.pk %}" class="btn btn-light border btn-sm icon-hover">
+                                <i class="fas fa-heart fa-lg {% if request.user.is_authenticated and product in request.user.wishlist.products.all %}text-danger{% else %}text-secondary{% endif %}"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .product-img {
+        width: 100%;
+        height: 300px;
+        border-bottom: 2px solid #f5f5f5;
+    }
+
+    .icon-hover:hover i {
+        color: #ff5252;
+    }
+
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}

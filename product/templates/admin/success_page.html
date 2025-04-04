@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; height: 75vh; ">
+    <div style="width: 450px; padding: 30px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); text-align: center;">
+        <h2 style="color: #28a745; font-family: Arial, sans-serif; font-size: 24px; margin-bottom: 20px;">Product Added Successfully!</h2>
+        <p style="color: #555; font-size: 16px; margin-bottom: 20px;">The product has been added to the database.</p>
+        
+        
+
+        <a href="{% url 'admin:index' %}" style="display: inline-block; padding: 12px 24px; background-color: #6c757d; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 600; text-decoration: none; margin-top: 10px; transition: background-color 0.3s; margin-left: 10px;">
+            Go to Admin Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

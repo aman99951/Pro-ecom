@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center">My Orders</h2>
+    {% if orders %}
+        <div class="list-group">
+            {% for order in orders %}
+            <a href="{% url 'order_detail' order.id %}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Order ID: {{ order.id }}</h5>
+                    <small>{{ order.created_at|date:"F d, Y" }}</small>
+                </div>
+                <p class="mb-1">Total: ₹{{ order.final_price }} | Status: {{ order.get_status_display }}</p>
+                <small>Payment Method: {{ order.payment_method|capfirst }}</small>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center">You haven't placed any orders yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

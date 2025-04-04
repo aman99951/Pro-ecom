@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h3 class="text-black font-weight-bold">Ticket Details </h3>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded">
+        <div class="card-header bg-primary text-white rounded-top">
+            <h5 class="mb-0">{{ ticket.subject }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Department:</strong> {{ ticket.deparment }}</p>
+                    <p><strong>Status:</strong> <span class="badge badge-info" style="background-color: black;">{{ ticket.get_status_display }}</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Created At:</strong> {{ ticket.created_at|date:"Y-m-d" }}</p>
+                </div>
+                <div class="col-12">
+                    <p><strong>Description:</strong></p>
+                    <p class="text-muted">{{ ticket.description }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attachments section -->
+        <div class="card-body border-top">
+            <h6><strong>Attachment:</strong></h6>
+            {% if ticket.attachments %}
+                <a href="{{ ticket.attachments.url }}" class="btn btn-sm btn-outline-secondary" download>{{ ticket.attachments.name }}</a>
+            {% else %}
+                <p class="text-muted">No attachments available.</p>
+            {% endif %}
+        </div>
+
+        <!-- Chat section -->
+        <div class="card-body border-top bg-light">
+            <h6>Messages:</h6>
+            <div class="message-list mb-3">
+                <ul class="list-unstyled">
+                    {% if latest_reply %}
+                    <li class="p-3 mb-2 rounded {% if latest_reply.agent %} agent-message {% else %} user-message {% endif %}">
+                        <small class="text-muted">{{ latest_reply.created_at|date:"Y-m-d H:i" }}</small>
+                        <p>{{ latest_reply.message }}</p>
+                    </li>
+                    {% else %}
+                    <li class="text-muted">No messages yet.</li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            {% if ticket.status != 'Closed' %}
+            <!-- Message Form -->
+            <form method="POST" class="mt-3">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.message }}
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+            </form>
+            {% elif error %}
+            <p class="text-danger mt-3">{{ error }}</p>
+            {% else %}
+            <p class="text-muted mt-3">This ticket is closed. No further messages can be sent.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    .card {
+        border-radius: 10px;
+    }
+    .agent-message {
+        background-color: #e9f7ef;
+        border-left: 4px solid #28a745;
+        padding: 10px;
+    }
+    .user-message {
+        background-color: #f0f4f8;
+        border-left: 4px solid #007bff;
+        padding: 10px;
+    }
+    .btn-outline-secondary {
+        font-size: 0.9rem;
+        border-radius: 20px;
+    }
+    .btn-primary {
+        background-color: #0069d9;
+        border-radius: 20px;
+    }
+    .message-list {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}

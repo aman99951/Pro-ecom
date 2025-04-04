@@ -1,0 +1,30 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; height: 75vh;">
+    <div style="width: 450px; padding: 30px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+        <h2 style="text-align: center; color: #444; font-family: Arial, sans-serif; font-size: 24px; margin-bottom: 20px;">Add Ajio Product</h2>
+        
+        <form method="POST" style="display: flex; flex-direction: column;">
+            {% csrf_token %}
+            
+            <label for="url" style="font-weight: 600; margin-bottom: 8px; color: #555;">Product URL:</label>
+            <input type="text" id="url" name="url" required 
+                   style="padding: 10px; margin-bottom: 20px; border: 1px solid #606162; border-radius: 5px; font-size: 14px; color: #333; background-color: white;">
+            
+            <button type="submit" 
+                    style="padding: 12px; background-color: #417690; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background-color 0.3s;">
+                Add Product
+            </button>
+        </form>
+        
+        {% if messages %}
+            <div style="margin-top: 15px; text-align: center;">
+                {% for message in messages %}
+                    <p style="color: #28a745; font-size: 14px; font-weight: 500;">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

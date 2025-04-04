@@ -1,0 +1,484 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+
+<!-- sidebar + content -->
+<section class="">
+  <div class="container">
+    <div class="row">
+      <!-- sidebar -->
+      <div class="col-lg-3">
+        <!-- Toggle button -->
+        <button
+                class="btn btn-outline-secondary mb-3 w-100 d-lg-none"
+                type="button"
+                data-mdb-toggle="collapse"
+                data-mdb-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+                >
+          <span>Show filter</span>
+        </button>
+        <!-- Collapsible wrapper -->
+        <div class="collapse card d-lg-block mb-5" id="navbarSupportedContent">
+          <div class="accordion" id="accordionPanelsStayOpenExample">
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingOne">
+                  <button
+                      class="accordion-button text-dark bg-light"
+                      type="button"
+                      data-mdb-toggle="collapse"
+                      data-mdb-target="#panelsStayOpen-collapseOne"
+                      aria-expanded="true"
+                      aria-controls="panelsStayOpen-collapseOne"
+                  >
+                      Categories
+                  </button>
+              </h2>
+              
+              <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne">
+                  <div class="accordion-body">
+                    <form id="categoryFilterForm" action="{% url 'filtered_products_by_category' %}" method="get">
+                      {% for category in categories %}
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="{{ category.id }}" id="categoryCheck{{ category.id }}" 
+                                 name="category" {% if category.id|stringformat:"s" in selected_categories %}checked{% endif %}
+                                 onchange="document.getElementById('categoryFilterForm').submit();" />
+                          <label class="form-check-label" for="categoryCheck{{ category.id }}">{{ category.name }}</label>
+                          <span class="badge badge-secondary float-end">{{ category.product_count }}</span>
+                      </div>
+                      {% endfor %}
+                      <button type="none" class="btn btn-white w-100 border border-secondary mt-2">show Categories</button>
+                  </form>
+                  </div>
+              </div>
+          </div>
+           
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingTwo">
+                  <button
+                      class="accordion-button text-dark bg-light"
+                      type="button"
+                      data-mdb-toggle="collapse"
+                      data-mdb-target="#panelsStayOpen-collapseTwo"
+                      aria-expanded="true"
+                      aria-controls="panelsStayOpen-collapseTwo"
+                  >
+                      Subcategories
+                  </button>
+              </h2>
+              <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingTwo">
+                  <div class="accordion-body">
+                    <form id="subcategoryFilterForm" action="{% url 'filtered_products_by_subcategory' %}" method="get">
+                      {% for subcategory in subcategories %}
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="{{ subcategory.id }}" id="subcategoryCheck{{ subcategory.id }}" 
+                                 name="subcategory" {% if subcategory.id|stringformat:"s" in selected_subcategories %}checked{% endif %}
+                                 onchange="document.getElementById('subcategoryFilterForm').submit();" />
+                          <label class="form-check-label" for="subcategoryCheck{{ subcategory.id }}">{{ subcategory.name }}</label>
+                          <span class="badge badge-secondary float-end">{{ subcategory.product_count }}</span>
+                      </div>
+                      {% endfor %}
+                      <button type="none" class="btn btn-white w-100 border border-secondary mt-2">show Subcategories</button>
+                  </form>
+                  </div>
+              </div>
+          </div>
+          
+          
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingThree">
+                  <button
+                      class="accordion-button text-dark bg-light"
+                      type="button"
+                      data-mdb-toggle="collapse"
+                      data-mdb-target="#panelsStayOpen-collapseThree"
+                      aria-expanded="false"
+                      aria-controls="panelsStayOpen-collapseThree"
+                  >
+                      Price
+                  </button>
+              </h2>
+              <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse show" aria-labelledby="headingThree">
+                  <div class="accordion-body">
+                     
+                    <form id="priceFilterForm" action="{% url 'filtered_products_by_price' %}" method="get">
+                      <div class="row mb-3">
+                          <div class="col-6">
+                              <p class="mb-0">Min</p>
+                              <div class="form-outline">
+                                  <input type="number" id="minPrice" name="min_price" class="form-control" />
+                                  <label class="form-label" for="minPrice">Rs0</label>
+                              </div>
+                          </div>
+                          <div class="col-6">
+                              <p class="mb-0">Max</p>
+                              <div class="form-outline">
+                                  <input type="number" id="maxPrice" name="max_price" class="form-control" 
+                                         onchange="submitPriceFilterForm()" />
+                                  <label class="form-label" for="maxPrice">Rs1,0000</label>
+                              </div>
+                          </div>
+                      </div>
+                        </form>
+                  
+                  </div>
+              </div>
+          </div>
+
+          <form method="GET" action="{% url 'filtered_products_by_size' %}">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button
+                        class="accordion-button text-dark bg-light"
+                        type="button"
+                        data-mdb-toggle="collapse"
+                        data-mdb-target="#panelsStayOpen-collapseFour"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseFour">
+                        Size
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse show" aria-labelledby="headingThree">
+                    <div class="accordion-body">
+                        <!-- XS -->
+                        <input type="checkbox" class="btn-check border justify-content-center" name="size" value="XS" id="btn-check1" 
+                               {% if 'XS' in selected_sizes %}checked{% endif %} autocomplete="off" 
+                               onclick="this.form.submit()" />
+                        <label class="btn btn-white mb-1 px-1" style="width: 60px;" for="btn-check1">XS</label>
+        
+                        <!-- SM -->
+                        <input type="checkbox" class="btn-check border justify-content-center" name="size" value="SM" id="btn-check2" 
+                               {% if 'SM' in selected_sizes %}checked{% endif %} autocomplete="off" 
+                               onclick="this.form.submit()" />
+                        <label class="btn btn-white mb-1 px-1" style="width: 60px;" for="btn-check2">SM</label>
+        
+                        <!-- LG -->
+                        <input type="checkbox" class="btn-check border justify-content-center" name="size" value="LG" id="btn-check3" 
+                               {% if 'LG' in selected_sizes %}checked{% endif %} autocomplete="off" 
+                               onclick="this.form.submit()" />
+                        <label class="btn btn-white mb-1 px-1" style="width: 60px;" for="btn-check3">LG</label>
+        
+                        <!-- XXL -->
+                        <input type="checkbox" class="btn-check border justify-content-center" name="size" value="XXL" id="btn-check4" 
+                               {% if 'XXL' in selected_sizes %}checked{% endif %} autocomplete="off" 
+                               onclick="this.form.submit()" />
+                        <label class="btn btn-white mb-1 px-1" style="width: 60px;" for="btn-check4">XXL</label>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+            
+          
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingRatings">
+                  <button
+                    class="accordion-button text-dark bg-light"
+                    type="button"
+                    data-mdb-toggle="collapse"
+                    data-mdb-target="#panelsStayOpen-collapseFive"
+                    aria-expanded="false"
+                    aria-controls="panelsStayOpen-collapseFive">
+                    Ratings
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseFive" class="accordion-collapse collapse show" aria-labelledby="headingRatings">
+                  <form method="GET" action="{% url 'filtered_products' %}">
+                    <div class="accordion-body">
+                        <!-- Five Stars -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="rating" value="5" id="flexCheck5" 
+                                   {% if '5' in selected_ratings %}checked{% endif %} 
+                                   onclick="this.form.submit();" />
+                            <label class="form-check-label" for="flexCheck5">
+                                <i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </label>
+                        </div>
+                        <!-- Four Stars -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="rating" value="4" id="flexCheck4" 
+                                   {% if '4' in selected_ratings %}checked{% endif %} 
+                                   onclick="this.form.submit();" />
+                            <label class="form-check-label" for="flexCheck4">
+                                <i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-secondary"></i>
+                            </label>
+                        </div>
+                        <!-- Three Stars -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="rating" value="3" id="flexCheck3" 
+                                   {% if '3' in selected_ratings %}checked{% endif %} 
+                                   onclick="this.form.submit();" />
+                            <label class="form-check-label" for="flexCheck3">
+                                <i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i><i class="fas fa-star text-secondary"></i>
+                                <i class="fas fa-star text-secondary"></i>
+                            </label>
+                        </div>
+                        <!-- Two Stars -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="rating" value="2" id="flexCheck2" 
+                                   {% if '2' in selected_ratings %}checked{% endif %} 
+                                   onclick="this.form.submit();" />
+                            <label class="form-check-label" for="flexCheck2">
+                                <i class="fas fa-star text-warning"></i><i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-secondary"></i><i class="fas fa-star text-secondary"></i>
+                                <i class="fas fa-star text-secondary"></i>
+                            </label>
+                        </div>
+                        <!-- One Star -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="rating" value="1" id="flexCheck1" 
+                                   {% if '1' in selected_ratings %}checked{% endif %} 
+                                   onclick="this.form.submit();" />
+                            <label class="form-check-label" for="flexCheck1">
+                                <i class="fas fa-star text-warning"></i><i class="fas fa-star text-secondary"></i>
+                                <i class="fas fa-star text-secondary"></i><i class="fas fa-star text-secondary"></i>
+                                <i class="fas fa-star text-secondary"></i>
+                            </label>
+                        </div>
+                    </div>
+                   
+                </form>
+                
+                </div>
+              </div>
+             
+            
+            
+          </div>
+        </div>
+      </div>
+      <!-- sidebar -->
+      <!-- content -->
+      <div class="col-lg-9">
+        <header class="d-sm-flex align-items-center border-bottom mb-4 pb-3">
+          <strong class="d-block py-2">{{ products.paginator.count }}  Items found </strong>
+          <div class="ms-auto">
+            <form id="filterForm" method="get" action="{% url 'filtered_products_by_option' %}">
+              <select id="productFilter" class="form-select d-inline-block w-auto border pt-1" name="filter" onchange="this.form.submit()">
+                  <option value="1" {% if selected_filter == '1' %}selected{% endif %}>Top Selling</option>
+                  <option value="2" {% if selected_filter == '2' %}selected{% endif %}>Recommended</option>
+                  <option value="3" {% if selected_filter == '3' %}selected{% endif %}>On Sale</option>
+                  <option value="4" {% if selected_filter == '4' %}selected{% endif %}>All Products</option>
+              </select>
+              <div class="btn-group shadow-0 border">
+                <a href="#" class="btn btn-light" title="List view" id="listViewBtn">
+                    <i class="fa fa-bars fa-lg"></i>
+                </a>
+                <a href="#" class="btn btn-light active" title="Grid view" id="gridViewBtn">
+                    <i class="fa fa-th fa-lg"></i>
+                </a>
+            </div>
+       
+          </form>
+          
+             
+          </div>
+
+        </header>
+
+
+        <div class="product-container">
+          <div class="row grid-view">
+            {% for product in products %}
+            <div class="col-lg-4 col-md-6 col-sm-6 d-flex">
+              <div class="card w-100 my-2 shadow-2-strong">
+                <img src="{{ product.images.first.image.url }}" class="card-img-top product-img" alt="{{ product.name }}" height="200px" >
+                <div class="card-body d-flex flex-column">
+                  <div class="d-flex flex-row">
+                    <h5 class="mb-1 me-1">Rs {{ product.variants.first.price }}</h5>
+                  </div>
+                  <p class="card-text">{{ product.description }}</p>   
+                  <div class="d-flex justify-content-between align-items-center mt-auto">
+                    <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary btn-sm shadow-sm">Buy Product</a>
+                    <a href="{% url 'toggle_wishlist' product.pk %}" class="btn btn-light border btn-sm icon-hover">
+                        <i class="fas fa-heart fa-lg {% if request.user.is_authenticated and product in request.user.wishlist.products.all %}text-danger{% else %}text-secondary{% endif %}"></i>
+                    </a>
+                </div>
+
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <p>No products found.</p>
+            {% endfor %}
+          </div>
+        
+          <div class="row list-view" style="display: none;">
+            {% for product in products %}
+            <div class="col-md-12 mb-3">
+              <div class="card shadow-0 border rounded-3">
+                <div class="card-body">
+                  <div class="row g-0">
+                    <div class="col-xl-3 col-md-4 d-flex justify-content-center">
+                      <div class="bg-image hover-zoom ripple rounded ripple-surface me-md-3 mb-3 mb-md-0">
+                        <img src="{{ product.images.first.image.url }}"  alt="{{ product.name }}" width="150" height="100px"/>
+                      </div>
+                    </div>
+                    <div class="col-xl-6 col-md-5 col-sm-7">
+                      <h5>{{ product.name }}</h5>
+                      <p class="text mb-4 mb-md-0">{{ product.description }}</p>
+                    </div>
+                    <div class="col-xl-3 col-md-3 col-sm-5">
+                      <h4 class="mb-1 me-1">Rs {{ product.variants.first.price }}</h4>
+                      <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">View Product</a>
+                      <a href="{% url 'toggle_wishlist' product.pk %}" class="btn btn-light border btn-sm icon-hover">
+                        <i class="fas fa-heart fa-lg {% if request.user.is_authenticated and product in request.user.wishlist.products.all %}text-danger{% else %}text-secondary{% endif %}"></i>
+                    </a>
+                   </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <p>No products found.</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        
+        
+      
+        <hr />
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper">
+          <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                  {% if products.has_previous %}
+                      <li class="page-item">
+                          <a class="page-link" href="?page=1" aria-label="First">
+                              <span aria-hidden="true">&laquo; First</span>
+                          </a>
+                      </li>
+                      <li class="page-item">
+                          <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
+                              <span aria-hidden="true">Previous</span>
+                          </a>
+                      </li>
+                  {% endif %}
+      
+                  <li class="page-item disabled">
+                      <span class="page-link">Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+                  </li>
+      
+                  {% if products.has_next %}
+                      <li class="page-item">
+                          <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
+                              <span aria-hidden="true">Next</span>
+                          </a>
+                      </li>
+                      <li class="page-item">
+                          <a class="page-link" href="?page={{ products.paginator.num_pages }}" aria-label="Last">
+                              <span aria-hidden="true">Last &raquo;</span>
+                          </a>
+                      </li>
+                  {% endif %}
+              </ul>
+          </nav>
+      </div>
+      
+        <!-- Pagination -->
+      </div>
+    </div>
+  </div>            
+</section>
+
+<style>
+  .pagination-wrapper {
+    margin: 20px 0;
+}
+
+.pagination {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.page-item {
+    margin: 0 5px;
+}
+
+.page-link {
+    color: #007bff; /* Bootstrap primary color */
+    padding: 10px 15px;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.page-link:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    background-color: #f8f9fa; /* Light grey for disabled state */
+    color: #6c757d; /* Grey color */
+    border: 1px solid #dee2e6; /* Light border */
+}
+
+.page-item.active .page-link {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+}
+
+</style>
+<script>
+  function submitPriceFilterForm() {
+      const maxPriceInput = document.getElementById('maxPrice');
+      if (maxPriceInput.value) { // Check if max price is set
+          document.getElementById('priceFilterForm').submit(); // Submit the form
+      }
+  }
+  </script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const listViewBtn = document.getElementById("listViewBtn");
+    const gridViewBtn = document.getElementById("gridViewBtn");
+    const productContainer = document.querySelector(".product-container");
+
+    listViewBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      productContainer.querySelector(".grid-view").style.display = "none";
+      productContainer.querySelector(".list-view").style.display = "block";
+      listViewBtn.classList.add("active");
+      gridViewBtn.classList.remove("active");
+    });
+
+    gridViewBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      productContainer.querySelector(".grid-view").style.display = "flex";
+      productContainer.querySelector(".list-view").style.display = "none";
+      gridViewBtn.classList.add("active");
+      listViewBtn.classList.remove("active");
+    });
+  });
+</script>
+<script>
+  function applyPriceFilter() {
+      const minPrice = document.getElementById('minPrice').value;
+      const maxPrice = document.getElementById('maxPrice').value;
+      
+      // Construct the URL for filtering
+      const url = `{% url 'filtered_products_by_price' %}?min_price=${minPrice}&max_price=${maxPrice}`;
+      
+      // Redirect to the filtered URL
+      window.location.href = url;
+  }
+</script>
+
+
+{% endblock %}
